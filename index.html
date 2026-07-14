@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   body{font-family:'Inter',system-ui,sans-serif;background:#f0f4f8}
   .sidebar{width:240px;min-height:100vh;position:fixed;left:0;top:0;z-index:45;display:flex;flex-direction:column}
   .main-content{margin-left:240px;min-height:100vh}
@@ -660,7 +660,7 @@ function buildNav(){
   document.getElementById('nav-username').textContent=currentUser.nombre;
   const menu=document.getElementById('nav-menu');
   const items=currentUser.role==='admin'?NAV_ADMIN:[...NAV_USER];
-  menu.innerHTML=items.map(i=>`<div class="nav-item" id="nav-${i.id}" onclick="showSection('${i.id}')"><span>${i.icon}</span><span>${i.label}</span></div>`).join('');
+  menu.innerHTML=items.map(i=>`<div class="nav-item" id="nav-${i.id}" onclick="showSection('${i.id}')" style="cursor:pointer;user-select:none;-webkit-user-select:none"><span>${i.icon}</span><span>${i.label}</span></div>`).join('');
 }
 function showSection(id){
   closeMobileMenu();
@@ -688,8 +688,16 @@ function fmt(n){return 'Bs. '+Number(n).toFixed(2)}
 function fmtDate(iso){if(!iso)return '-';const d=new Date(iso);return d.toLocaleDateString('es-BO',{day:'2-digit',month:'2-digit',year:'numeric'})}
 function fmtDateTime(iso){if(!iso)return '-';const d=new Date(iso);return d.toLocaleDateString('es-BO',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})}
 function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type);setTimeout(()=>t.className='toast',2800)}
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openModal(id){
+  const el=document.getElementById(id);
+  el.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){
+  const el=document.getElementById(id);
+  el.classList.remove('open');
+  document.body.style.overflow='';
+}
 function getUserName(id){const u=DB.users.find(x=>x.id===id);return u?u.nombre:id}
 
 function filterByPeriod(items,period,field='fecha'){
@@ -1469,6 +1477,17 @@ document.addEventListener('DOMContentLoaded',ajustarPaddingMovil);
 // ============================================================
 // INIT
 // ============================================================
+// Fix iOS Safari click en divs
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.modal-overlay').forEach(el=>{
+    el.addEventListener('touchend',function(e){
+      if(e.target===this){
+        const id=this.id;
+        closeModal(id);
+      }
+    });
+  });
+});
 initDB();
 const _sesionGuardada=recuperarSesion();
 if(_sesionGuardada){
