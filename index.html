@@ -148,7 +148,7 @@
         </div>
       </div>
     </div>
-    <nav style="padding:12px 0;flex:1;overflow-y:auto" id="nav-menu"></nav>
+    <nav style="padding:12px 0;overflow-y:auto" id="nav-menu"></nav>
     <div style="padding:16px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0">
       <button onclick="doLogout()" class="nav-item" style="width:100%;margin:0;justify-content:start">
         <span>🚪</span><span>Cerrar sesión</span>
@@ -998,9 +998,11 @@ function limpiarFiltrosGC(){
 }
 
 function renderGastosChoferes(){
-  // Poblar select chofer
+// Poblar select chofer (conservando selección actual)
   const sel=document.getElementById('gc-chofer-filter');
+  const chFilterActual=sel.value;
   sel.innerHTML='<option value="">Todos</option>'+DB.choferes.map(c=>`<option value="${c.id}">${c.nombre} — ${c.placa}</option>`).join('');
+  sel.value=chFilterActual;
   const chFilter=sel.value;
   const desde=document.getElementById('gc-desde').value;
   const hasta=document.getElementById('gc-hasta').value;
@@ -1302,10 +1304,12 @@ function limpiarFiltrosHist(){
   renderHistorial();
 }
 function renderHistorial(){
-  // Poblar select usuarios
+// Poblar select usuarios (conservando selección actual)
   const sel=document.getElementById('hist-user-filter');
+  const uFilterActual=sel.value;
   const users=DB.users.filter(u=>u.role!=='admin');
   sel.innerHTML='<option value="">Todos</option>'+users.map(u=>`<option value="${u.id}">${u.nombre}</option>`).join('');
+  sel.value=uFilterActual;
   const uFilter=sel.value;
   const desde=document.getElementById('hist-desde').value;
   const hasta=document.getElementById('hist-hasta').value;
